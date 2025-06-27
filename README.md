@@ -23,52 +23,192 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+A simple CRM (Customer Relationship Management) backend application built with NestJS. This project demonstrates best practices in API development, authentication, role-based access control, and comprehensive testing strategies.
 
-## Project setup
+### Key Features
+
+- **JWT Authentication** with role-based access control (Admin/Viewer)
+- **Customer Management** with full CRUD operations
+- **User Management** with role assignment (Admin only)
+- **Health Check Endpoints** for monitoring and deployment
+- **Environment Configuration** with validation
+- **Comprehensive Testing** (Unit, Integration, E2E)
+- **CI/CD Pipeline** with GitHub Actions
+- **Automated Deployment** to Zeabur
+
+### Architecture
+
+- **Database**: MySQL with raw SQL queries
+- **Authentication**: JWT tokens with bcrypt password hashing
+- **Authorization**: Role-based guards (Admin/Viewer)
+- **API Design**: RESTful endpoints with proper HTTP status codes
+- **Documentation**: Comprehensive API documentation and deployment guides
+
+## Project Setup
+
+### Prerequisites
+
+- Node.js 18.x or 20.x
+- npm or yarn
+- MySQL database (for production)
+
+### Installation
 
 ```bash
+# Install dependencies
 $ npm install
+
+# Copy environment variables template
+$ cp .env.example .env
+
+# Configure your environment variables in .env file
 ```
 
-## Compile and run the project
+### Environment Configuration
+
+Create a `.env` file based on `.env.example` and configure the following variables:
 
 ```bash
-# development
-$ npm run start
+# Application
+PORT=3000
+NODE_ENV=development
 
-# watch mode
+# Database
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_NAME=crm_database
+
+# JWT
+JWT_SECRET=your_super_secret_jwt_key
+JWT_EXPIRES_IN=24h
+```
+
+## Development
+
+```bash
+# Start in development mode with hot reload
 $ npm run start:dev
 
-# production mode
+# Start in debug mode
+$ npm run start:debug
+
+# Build for production
+$ npm run build
+
+# Start production build
 $ npm run start:prod
 ```
 
-## Run tests
+### API Endpoints
+
+The application provides the following endpoints:
+
+- **Health Checks**:
+  - `GET /api/v1/health` - Application health status
+  - `GET /api/v1/health/ready` - Readiness check
+  - `GET /api/v1/health/live` - Liveness check
+
+- **Authentication**:
+  - `POST /api/v1/auth/login` - User login
+
+- **User Management** (Admin only):
+  - `GET /api/v1/users` - List all users
+  - `POST /api/v1/users` - Create new user
+  - `PUT /api/v1/users/:id` - Update user
+  - `DELETE /api/v1/users/:id` - Delete user
+
+- **Customer Management**:
+  - `GET /api/v1/customers` - List customers (Admin/Viewer)
+  - `GET /api/v1/customers/:id` - Get customer (Admin/Viewer)
+  - `POST /api/v1/customers` - Create customer (Admin only)
+  - `PUT /api/v1/customers/:id` - Update customer (Admin only)
+  - `DELETE /api/v1/customers/:id` - Delete customer (Admin only)
+
+## Testing
 
 ```bash
-# unit tests
+# Run unit tests
 $ npm run test
 
-# e2e tests
+# Run tests in watch mode
+$ npm run test:watch
+
+# Run tests with coverage
+$ npm run test:cov
+
+# Run E2E tests
 $ npm run test:e2e
 
-# test coverage
-$ npm run test:cov
+# Run linting
+$ npm run lint
+
+# Format code
+$ npm run format
 ```
 
-## Deployment
+## CI/CD Pipeline
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+This project includes automated CI/CD workflows using GitHub Actions:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Continuous Integration (`ci.yml`)
+
+- **Triggers**: Push to main/develop branches, pull requests to main
+- **Jobs**:
+  - Code quality checks (ESLint, Prettier)
+  - Unit and E2E tests with coverage
+  - Security audit
+  - Build verification
+
+### Continuous Deployment (`cd.yml`)
+
+- **Triggers**: Push to main branch (after CI passes)
+- **Jobs**:
+  - Production build
+  - Final test validation
+  - Automatic deployment to Zeabur
+
+## Deployment to Zeabur
+
+### Automatic Deployment
+
+1. **Connect Repository**: Link your GitHub repository to Zeabur
+2. **Environment Variables**: Configure required environment variables in Zeabur dashboard
+3. **Auto-Deploy**: Every push to main branch triggers automatic deployment
+
+### Manual Deployment Setup
+
+1. Create account at [Zeabur](https://zeabur.com)
+2. Connect your GitHub account
+3. Create new project and select this repository
+4. Configure environment variables:
+   - `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME`
+   - `JWT_SECRET`, `JWT_EXPIRES_IN`
+5. Deploy and monitor via Zeabur dashboard
+
+### Environment Variables in Zeabur
+
+Set the following environment variables in your Zeabur service:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+NODE_ENV=production
+DB_HOST=your_mysql_host
+DB_PORT=3306
+DB_USERNAME=your_db_username
+DB_PASSWORD=your_db_password
+DB_NAME=your_database_name
+JWT_SECRET=your_production_jwt_secret
+JWT_EXPIRES_IN=24h
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Health Checks
+
+After deployment, verify the application is running:
+
+- Health: `https://your-app.zeabur.app/api/v1/health`
+- Readiness: `https://your-app.zeabur.app/api/v1/health/ready`
+- Liveness: `https://your-app.zeabur.app/api/v1/health/live`
 
 ## Resources
 
