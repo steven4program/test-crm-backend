@@ -4,110 +4,156 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **NestJS-based CRM backend** that implements a simple Customer Relationship Management system with role-based access control (RBAC). The application supports two user roles: **Admin** (full CRUD access) and **Viewer** (read-only access).
+This is a **NestJS-based CRM backend** implementing a Customer Relationship Management system with JWT authentication and role-based access control (RBAC). Currently in **Phase 1 completion** with authentication and database infrastructure fully implemented.
 
-**Key Features:**
-- JWT-based authentication with role-based authorization
-- Customer management (CRUD operations)
-- User management (Admin-only)
-- MySQL database with raw SQL queries
-- RESTful API design
-- Default admin user seeding on startup
+**Implementation Status:**
+- ✅ **Phase 1 Complete**: Authentication, database layer, health checks, migrations
+- 🚧 **Phase 2 Pending**: User and Customer CRUD modules, role guards, DTOs
+- 📋 **Phase 3 Planned**: Comprehensive testing, Docker, deployment optimization
 
-## Architecture
+**Current Features:**
+- JWT authentication with bcrypt password hashing
+- MySQL database with raw SQL queries and connection pooling
+- Automatic database migrations and schema management
+- Health monitoring with database connectivity checks
+- Default admin user seeding
+- Global validation pipes and error handling
 
-The application follows NestJS's modular architecture:
-- **Controllers**: Handle HTTP requests/responses for auth, users, and customers
-- **Services**: Contain business logic and database interactions using raw SQL
-- **Modules**: Group related controllers and providers (AuthModule, UserModule, CustomerModule)
-- **Guards**: Implement JWT authentication and role-based authorization
+## Architecture Overview
 
-**Database**: MySQL with two main entities:
-- **User**: id, username, password (hashed), role (admin/viewer)
-- **Customer**: id, name, email, phone
+**Core Architecture Pattern**: NestJS modular design with dependency injection
+- **Global Modules**: DatabaseModule (connection pool), ConfigModule (environment)
+- **Feature Modules**: AuthModule (implemented), HealthModule (implemented)
+- **Pending Modules**: UserModule, CustomerModule (Phase 2)
+
+**Database Layer Architecture**:
+- `DatabaseService`: Connection pooling, query execution methods (executeQuery, executeInsert, executeUpdate, executeDelete)
+- `MigrationService`: Handles SQL migrations from `src/database/migrations/` directory
+- **Migration Files**: `001-create-users-table.sql`, `002-create-customers-table.sql`
+- **Automatic Migration**: Runs on application startup, tracks executed migrations
+
+**Authentication Flow**:
+- `AuthService`: Login validation, JWT token generation, user verification
+- `JwtStrategy`: Passport JWT strategy for token validation
+- `JwtAuthGuard`: Protects endpoints requiring authentication
+- **Token Structure**: `{ sub: userId, username, role }`
 
 ## Development Commands
 
-### Setup
+### Essential Setup
 ```bash
-npm install
+npm install                    # Install dependencies
+cp .env.example .env          # Copy environment template
+# Configure .env with your MySQL database settings
 ```
 
-### Development
+### Development Server
 ```bash
-npm run start:dev    # Start in watch mode
-npm run start        # Start normally
-npm run start:debug  # Start with debugging
+npm run start:dev             # Start with hot reload (recommended for development)
+npm run start:debug           # Start with debugging enabled
+npm run build && npm run start:prod  # Test production build locally
 ```
 
-### Building
+### Testing & Quality
 ```bash
-npm run build        # Build for production
-npm run start:prod   # Run production build
+npm run test                  # Run unit tests
+npm run test:watch           # Run tests in watch mode
+npm run test:cov             # Generate test coverage report
+npm run lint                 # ESLint with auto-fix
+npm run format               # Prettier code formatting
 ```
 
-### Testing
+### Database Operations
+The application automatically handles database operations on startup:
+- Creates migration tracking table
+- Runs pending SQL migrations from `src/database/migrations/`
+- Seeds default admin user (username: "admin", password: "Admin@123")
+
+## Current API Endpoints (Phase 1)
+
+**Base URL**: `http://localhost:3000/api/v1`
+
+**Health Monitoring:**
+- `GET /health` - Application health with database status
+- `GET /health/ready` - Readiness check (dependencies validation)
+- `GET /health/live` - Basic liveness check
+
+**Authentication (Implemented):**
+- `POST /auth/login` - Login with username/password, returns JWT token
+- `POST /auth/logout` - Logout (client-side token invalidation)
+
+**Planned Endpoints (Phase 2):**
+- User Management: `GET|POST|PUT|DELETE /users` (Admin-only)
+- Customer Management: `GET|POST|PUT|DELETE /customers` (Role-based access)
+
+## Environment Configuration
+
+**Required Environment Variables** (copy from `.env.example`):
 ```bash
-npm run test         # Run unit tests
-npm run test:watch   # Run tests in watch mode
-npm run test:cov     # Run tests with coverage
-npm run test:e2e     # Run end-to-end tests
+# Database (MySQL)
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_NAME=your_database
+
+# JWT Authentication
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRES_IN=24h
+
+# Application
+PORT=3000
+NODE_ENV=development
 ```
 
-### Code Quality
+## Database Architecture Details
+
+**Raw SQL Approach**: Uses `mysql2` with parameterized queries (no ORM)
+- Connection pooling with 10 max connections
+- Transaction support via `DatabaseService.transaction()`
+- Migration tracking in `migrations` table
+- Development vs production path resolution for migration files
+
+**Key Database Methods**:
+- `executeQuery<T>()` - Generic SELECT queries
+- `executeInsert()` - INSERT with insertId return
+- `executeUpdate()` - UPDATE with affected rows count
+- `executeDelete()` - DELETE with affected rows count
+
+## Application Startup Sequence
+
+1. **Module Initialization**: ConfigModule, DatabaseModule, AuthModule, HealthModule
+2. **Database Connection**: Create MySQL connection pool
+3. **Migration Execution**: Run pending SQL migrations
+4. **Admin User Seeding**: Create default admin if none exists
+5. **Server Start**: Listen on configured port with global validation
+
+## Docker & Deployment
+
+**Docker Configuration**:
+- `Dockerfile`: Multi-stage build with security best practices
+- `docker-compose.yml`: Complete development stack with MySQL
+- `.dockerignore`: Optimized build context
+- `zeabur.json`: Zeabur platform configuration
+
+**Docker Commands**:
 ```bash
-npm run lint         # Run ESLint with auto-fix
-npm run format       # Format code with Prettier
+docker build -t crm-backend .                    # Build image
+docker-compose up --build                        # Run complete stack
+docker-compose up -d --build                     # Run in background
 ```
 
-## API Endpoints Structure
+## CI/CD Integration
 
-**Authentication:**
-- `POST /auth/login` - Login and get JWT token (public)
-- `POST /auth/logout` - Logout (optional)
+**GitHub Actions workflows configured**:
+- `ci.yml`: Code quality, testing, security audits
+- `cd.yml`: Deployment pipeline for Zeabur
+- Automatic deployment on main branch push
+- Docker-based deployment with Zeabur auto-detection
 
-**User Management (Admin-only):**
-- `GET /users` - List all users
-- `POST /users` - Create new user
-- `PUT /users/{id}` - Update user
-- `DELETE /users/{id}` - Delete user
+## Development Notes
 
-**Customer Management:**
-- `GET /customers` - List customers (Admin/Viewer)
-- `GET /customers/{id}` - Get customer details (Admin/Viewer)
-- `POST /customers` - Create customer (Admin-only)
-- `PUT /customers/{id}` - Update customer (Admin-only)
-- `DELETE /customers/{id}` - Delete customer (Admin-only)
-
-## Security Implementation
-
-- Passwords are hashed using bcrypt before storage
-- JWT tokens contain user ID, username, and role
-- Auth Guard validates Bearer tokens on protected endpoints
-- Roles Guard enforces admin-only access where required
-- Default admin credentials: username "admin", password "Admin@123"
-
-## Database Connection
-
-The application uses raw SQL queries with MySQL via the `mysql2` package. Database configuration is handled through environment variables (host, port, credentials, database name).
-
-## Deployment
-
-- Containerized with Docker for deployment on Zeabur
-- Environment variables for database connection and JWT secret
-- CORS enabled for frontend integration
-- Port configured via `process.env.PORT`
-
-## Testing Strategy
-
-The project implements three levels of testing:
-- **Unit Tests**: Test individual services and controllers in isolation
-- **Integration Tests**: Test module interactions including database operations
-- **E2E Tests**: Test complete user flows and API endpoints
-
-## ESLint Configuration
-
-Custom ESLint rules are configured:
-- `@typescript-eslint/no-explicit-any`: disabled
-- `@typescript-eslint/no-floating-promises`: warning
-- `@typescript-eslint/no-unsafe-argument`: warning
+**Code Style**: ESLint + Prettier with custom rules
+**Testing Framework**: Jest with coverage reporting
+**API Testing**: `test-requests.http` file included for manual testing
+**Validation**: Global ValidationPipe with class-validator decorators

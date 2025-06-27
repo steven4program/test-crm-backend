@@ -1,0 +1,30 @@
+### Health Check
+GET http://localhost:3000/api/v1/health
+
+### Health Check Ready
+GET http://localhost:3000/api/v1/health/ready
+
+### Health Check Live
+GET http://localhost:3000/api/v1/health/live
+
+### Login with Default Admin
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "Admin@123"
+}
+
+### Test Invalid Login
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "invalid",
+  "password": "wrong"
+}
+
+### Logout
+POST http://localhost:3000/api/v1/auth/logout
+Content-Type: application/json

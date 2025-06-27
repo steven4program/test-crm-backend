@@ -1,0 +1,26 @@
+{
+  "name": "crm-backend",
+  "type": "nodejs",
+  "framework": "nestjs",
+  "buildCommand": "npm run build",
+  "startCommand": "npm run start:prod",
+  "port": 3000,
+  "dockerfile": "Dockerfile",
+  "healthCheck": {
+    "path": "/api/v1/health/live",
+    "timeout": 30,
+    "interval": 10
+  },
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  },
+  "volumes": [],
+  "services": [
+    {
+      "name": "mysql",
+      "type": "mysql",
+      "version": "8.0"
+    }
+  ]
+}

@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DatabaseService } from '../database/database.service';
 
 @Injectable()
 export class HealthService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly databaseService: DatabaseService,
+  ) {}
 
   getHealthStatus() {
     return {
@@ -23,13 +27,19 @@ export class HealthService {
     };
   }
 
-  getReadinessStatus() {
+  async getReadinessStatus() {
+    const databaseStatus = await this.checkDatabase();
+    const configStatus = this.checkConfiguration();
+
     return {
-      status: 'ready',
+      status:
+        databaseStatus === 'ok' && configStatus === 'ok'
+          ? 'ready'
+          : 'not_ready',
       timestamp: new Date().toISOString(),
       checks: {
-        database: 'ok', // Will be implemented with actual DB connection
-        configuration: this.checkConfiguration(),
+        database: databaseStatus,
+        configuration: configStatus,
       },
     };
   }
@@ -41,8 +51,24 @@ export class HealthService {
     };
   }
 
+  private async checkDatabase(): Promise<string> {
+    try {
+      const isConnected = await this.databaseService.checkConnection();
+      return isConnected ? 'ok' : 'error';
+    } catch {
+      return 'error';
+    }
+  }
+
   private checkConfiguration(): string {
-    const requiredConfig = ['NODE_ENV', 'JWT_SECRET'];
+    const requiredConfig = [
+      'NODE_ENV',
+      'JWT_SECRET',
+      'DB_HOST',
+      'DB_USERNAME',
+      'DB_PASSWORD',
+      'DB_NAME',
+    ];
 
     for (const config of requiredConfig) {
       if (!this.configService.get(config)) {
