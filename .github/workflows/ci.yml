@@ -58,7 +58,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: test_password
           MYSQL_DATABASE: simple_crm
-          MYSQL_USERNAME: test_user
+          MYSQL_USER: test_user
           MYSQL_PASSWORD: test_password
         ports:
           - 3306:3306
