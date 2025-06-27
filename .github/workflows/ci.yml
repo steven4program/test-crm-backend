@@ -52,6 +52,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test_password
+          MYSQL_DATABASE: simple_crm
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -70,6 +82,14 @@ jobs:
 
     - name: Run E2E tests
       run: npm run test:e2e
+      env:
+        MYSQL_HOST: localhost
+        MYSQL_PORT: 3306
+        MYSQL_USER: test_user
+        MYSQL_PASSWORD: test_password
+        MYSQL_DATABASE: simple_crm
+        JWT_SECRET: test_jwt_secret_for_ci
+        NODE_ENV: test
 
   security:
     runs-on: ubuntu-latest
