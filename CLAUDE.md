@@ -91,11 +91,11 @@ The application automatically handles database operations on startup:
 **Required Environment Variables** (copy from `.env.example`):
 ```bash
 # Database (MySQL)
-DB_HOST=localhost
-DB_PORT=3306
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
-DB_NAME=your_database
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USERNAME=your_username
+MYSQL_PASSWORD=your_password
+MYSQL_NAME=your_database
 
 # JWT Authentication
 JWT_SECRET=your_jwt_secret_key

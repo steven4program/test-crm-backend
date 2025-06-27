@@ -64,10 +64,10 @@ export class HealthService {
     const requiredConfig = [
       'NODE_ENV',
       'JWT_SECRET',
-      'DB_HOST',
-      'DB_USERNAME',
-      'DB_PASSWORD',
-      'DB_NAME',
+      'MYSQL_HOST',
+      'MYSQL_USERNAME',
+      'MYSQL_PASSWORD',
+      'MYSQL_NAME',
     ];
 
     for (const config of requiredConfig) {

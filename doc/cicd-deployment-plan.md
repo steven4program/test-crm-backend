@@ -35,11 +35,11 @@ Production Environment
 - **Create ConfigModule**: Set up centralized configuration
 - **Environment variables needed**:
   - `PORT` - Application port (provided by Zeabur)
-  - `DB_HOST` - MySQL host
-  - `DB_PORT` - MySQL port
-  - `DB_USERNAME` - Database username
-  - `DB_PASSWORD` - Database password
-  - `DB_NAME` - Database name
+  - `MYSQL_HOST` - MySQL host
+  - `MYSQL_PORT` - MySQL port
+  - `MYSQL_USERNAME` - Database username
+  - `MYSQL_PASSWORD` - Database password
+  - `MYSQL_NAME` - Database name
   - `JWT_SECRET` - JWT signing secret
   - `JWT_EXPIRES_IN` - Token expiration time
 - **Create `.env.example`**: Template for required environment variables
@@ -207,11 +207,11 @@ PORT=3000
 NODE_ENV=production
 
 # Database Configuration
-DB_HOST=localhost
-DB_PORT=3306
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
-DB_NAME=crm_database
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USERNAME=your_username
+MYSQL_PASSWORD=your_password
+MYSQL_NAME=crm_database
 
 # JWT Configuration
 JWT_SECRET=your_super_secret_jwt_key

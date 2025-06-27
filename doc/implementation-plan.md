@@ -105,7 +105,7 @@ This document outlines the step-by-step implementation plan for the NestJS CRM b
 #### 10. Environment Configuration
 - Set up `ConfigModule` for environment variable management
 - Define required environment variables:
-  - `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME`
+  - `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USERNAME`, `MYSQL_PASSWORD`, `MYSQL_NAME`
   - `JWT_SECRET`, `JWT_EXPIRES_IN`
   - `PORT` (for deployment)
 - Create configuration validation schema

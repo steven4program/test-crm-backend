@@ -74,11 +74,11 @@ PORT=3000
 NODE_ENV=development
 
 # Database
-DB_HOST=localhost
-DB_PORT=3306
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
-DB_NAME=crm_database
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USERNAME=your_username
+MYSQL_PASSWORD=your_password
+MYSQL_NAME=crm_database
 
 # JWT
 JWT_SECRET=your_super_secret_jwt_key
@@ -183,7 +183,7 @@ This project includes automated CI/CD workflows using GitHub Actions:
 2. Connect your GitHub account
 3. Create new project and select this repository
 4. Configure environment variables:
-   - `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME`
+   - `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USERNAME`, `MYSQL_PASSWORD`, `MYSQL_NAME`
    - `JWT_SECRET`, `JWT_EXPIRES_IN`
 5. Deploy and monitor via Zeabur dashboard
 
@@ -193,11 +193,11 @@ Set the following environment variables in your Zeabur service:
 
 ```bash
 NODE_ENV=production
-DB_HOST=your_mysql_host
-DB_PORT=3306
-DB_USERNAME=your_db_username
-DB_PASSWORD=your_db_password
-DB_NAME=your_database_name
+MYSQL_HOST=your_mysql_host
+MYSQL_PORT=3306
+MYSQL_USERNAME=your_MYSQL_username
+MYSQL_PASSWORD=your_MYSQL_password
+MYSQL_NAME=your_database_name
 JWT_SECRET=your_production_jwt_secret
 JWT_EXPIRES_IN=24h
 ```

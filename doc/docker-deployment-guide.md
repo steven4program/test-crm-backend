@@ -50,10 +50,10 @@ docker build -t crm-backend .
 
 # Run with external database
 docker run -p 3000:3000 \
-  -e DB_HOST=your_mysql_host \
-  -e DB_USERNAME=your_username \
-  -e DB_PASSWORD=your_password \
-  -e DB_NAME=simple_crm \
+  -e MYSQL_HOST=your_mysql_host \
+  -e MYSQL_USERNAME=your_username \
+  -e MYSQL_PASSWORD=your_password \
+  -e MYSQL_NAME=simple_crm \
   -e JWT_SECRET=your_jwt_secret \
   crm-backend
 ```
@@ -82,11 +82,11 @@ NODE_ENV=production
 PORT=3000
 
 # Database (use Zeabur MySQL service)
-DB_HOST=your_zeabur_mysql_host
-DB_PORT=3306
-DB_USERNAME=your_mysql_username
-DB_PASSWORD=your_mysql_password
-DB_NAME=simple_crm
+MYSQL_HOST=your_zeabur_mysql_host
+MYSQL_PORT=3306
+MYSQL_USERNAME=your_mysql_username
+MYSQL_PASSWORD=your_mysql_password
+MYSQL_NAME=simple_crm
 
 # JWT Configuration
 JWT_SECRET=your_production_jwt_secret_here
@@ -168,10 +168,10 @@ docker-compose exec crm-backend ping mysql
 
 ```bash
 # Check environment variables in container
-docker-compose exec crm-backend env | grep DB_
+docker-compose exec crm-backend env | grep MYSQL_
 
 # Verify configuration
-docker-compose exec crm-backend node -e "console.log(process.env.DB_HOST)"
+docker-compose exec crm-backend node -e "console.log(process.env.MYSQL_HOST)"
 ```
 
 ## Production Considerations
