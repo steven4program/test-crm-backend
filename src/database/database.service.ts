@@ -30,7 +30,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       this.pool = mysql.createPool({
         host: this.configService.get<string>('MYSQL_HOST', 'localhost'),
         port: this.configService.get<number>('MYSQL_PORT', 3306),
-        user: this.configService.get<string>('MYSQL_USER'),
+        user: this.configService.get<string>('MYSQL_USERNAME'),
         password: this.configService.get<string>('MYSQL_PASSWORD'),
         database: this.configService.get<string>('MYSQL_DATABASE'),
         waitForConnections: true,
