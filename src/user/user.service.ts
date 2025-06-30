@@ -32,7 +32,7 @@ export class UserService {
   ): Promise<PaginatedUserResponseDto> {
     const { page = 1, limit = 10 } = paginationQuery || {};
     const offset = (page - 1) * limit;
-    
+
     // Get total count
     const countQuery = 'SELECT COUNT(*) as total FROM users';
     const countResult = await this.databaseService.executeQuery<{
@@ -48,15 +48,14 @@ export class UserService {
       LIMIT ${limit} OFFSET ${offset}
     `;
 
-    const users = await this.databaseService.executeQuery<UserWithoutPassword>(
-      dataQuery,
-    );
+    const users =
+      await this.databaseService.executeQuery<UserWithoutPassword>(dataQuery);
 
     // Calculate pagination metadata
     const totalPages = Math.ceil(total / limit);
     const hasNext = page < totalPages;
     const hasPrev = page > 1;
-    
+
     const pagination: PaginationMetaDto = {
       total,
       page,
