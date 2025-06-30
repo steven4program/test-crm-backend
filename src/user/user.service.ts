@@ -6,6 +6,11 @@ import {
 import { DatabaseService } from '../database/database.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  PaginationQueryDto,
+  PaginatedUserResponseDto,
+  PaginationMetaDto,
+} from './dto/pagination.dto';
 import * as bcrypt from 'bcrypt';
 
 export interface User {
@@ -22,14 +27,49 @@ export type UserWithoutPassword = Omit<User, 'password'>;
 export class UserService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async findAll(): Promise<UserWithoutPassword[]> {
-    const query = `
+  async findAll(
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<PaginatedUserResponseDto> {
+    const { page = 1, limit = 10 } = paginationQuery || {};
+    const offset = (page - 1) * limit;
+    
+    // Get total count
+    const countQuery = 'SELECT COUNT(*) as total FROM users';
+    const countResult = await this.databaseService.executeQuery<{
+      total: number;
+    }>(countQuery);
+    const total = countResult[0].total;
+
+    // Get paginated data
+    const dataQuery = `
       SELECT id, username, role, created_at, updated_at 
       FROM users 
       ORDER BY created_at DESC
+      LIMIT ${limit} OFFSET ${offset}
     `;
 
-    return this.databaseService.executeQuery<UserWithoutPassword>(query);
+    const users = await this.databaseService.executeQuery<UserWithoutPassword>(
+      dataQuery,
+    );
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+    const hasNext = page < totalPages;
+    const hasPrev = page > 1;
+    
+    const pagination: PaginationMetaDto = {
+      total,
+      page,
+      limit,
+      totalPages,
+      hasNext,
+      hasPrev,
+    };
+
+    return {
+      data: users,
+      pagination,
+    };
   }
 
   async findById(id: number): Promise<UserWithoutPassword> {

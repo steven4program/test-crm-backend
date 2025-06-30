@@ -2,6 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import {
+  PaginationQueryDto,
+  PaginatedCustomerResponseDto,
+  PaginationMetaDto,
+} from './dto/pagination.dto';
 
 export interface Customer {
   id: number;
@@ -18,14 +23,48 @@ export interface Customer {
 export class CustomerService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async findAll(): Promise<Customer[]> {
-    const query = `
+  async findAll(
+    paginationQuery?: PaginationQueryDto,
+  ): Promise<PaginatedCustomerResponseDto> {
+    const { page = 1, limit = 10 } = paginationQuery || {};
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    const countQuery = 'SELECT COUNT(*) as total FROM customers';
+    const countResult = await this.databaseService.executeQuery<{
+      total: number;
+    }>(countQuery);
+    const total = countResult[0].total;
+
+    // Get paginated data
+    const dataQuery = `
       SELECT id, name, email, phone, company, address, created_at, updated_at 
       FROM customers 
       ORDER BY created_at DESC
+      LIMIT ${limit} OFFSET ${offset}
     `;
 
-    return this.databaseService.executeQuery<Customer>(query);
+    const customers =
+      await this.databaseService.executeQuery<Customer>(dataQuery);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+    const hasNext = page < totalPages;
+    const hasPrev = page > 1;
+
+    const pagination: PaginationMetaDto = {
+      total,
+      page,
+      limit,
+      totalPages,
+      hasNext,
+      hasPrev,
+    };
+
+    return {
+      data: customers,
+      pagination,
+    };
   }
 
   async findById(id: number): Promise<Customer> {

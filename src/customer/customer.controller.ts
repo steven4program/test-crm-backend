@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   ParseIntPipe,
   HttpCode,
@@ -14,6 +15,7 @@ import {
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { PaginationQueryDto } from './dto/pagination.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -25,8 +27,8 @@ export class CustomerController {
 
   @Get()
   @Roles('admin', 'viewer')
-  async findAll() {
-    return this.customerService.findAll();
+  async findAll(@Query() paginationQuery: PaginationQueryDto) {
+    return this.customerService.findAll(paginationQuery);
   }
 
   @Get(':id')

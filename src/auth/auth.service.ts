@@ -90,4 +90,14 @@ export class AuthService {
       return null;
     }
   }
+
+  async getProfile(userId: number): Promise<User> {
+    const user = await this.validateUserById(userId);
+    
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
+  }
 }
