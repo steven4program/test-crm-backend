@@ -87,7 +87,7 @@ jobs:
         MYSQL_PORT: 3306
         MYSQL_USERNAME: test_user
         MYSQL_PASSWORD: test_password
-        MYSQL_NAME: simple_crm
+        MYSQL_DATABASE: simple_crm
         JWT_SECRET: test_jwt_secret_for_ci
         NODE_ENV: test
 

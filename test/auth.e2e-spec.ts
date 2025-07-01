@@ -3,6 +3,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { Application } from 'express';
+import { MigrationService } from '../src/database/migration.service';
 
 interface LoginResponse {
   access_token: string;
@@ -44,6 +45,11 @@ describe('Auth (e2e)', () => {
     );
 
     await app.init();
+
+    // Run migrations and seed test data
+    const migrationService = app.get(MigrationService);
+    await migrationService.runMigrations();
+    await migrationService.seedDefaultAdmin();
   }, 30000);
 
   afterAll(async () => {
